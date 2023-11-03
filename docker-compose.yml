@@ -1,0 +1,35 @@
+version: '3'
+services:
+  mysql:
+    image: mysql:latest
+    environment:
+      MYSQL_ROOT_PASSWORD: admin@umc
+      MYSQL_DATABASE: umc-db
+      MYSQL_USER: umc-admin
+      MYSQL_PASSWORD: admin@umc
+    volumes:
+      - mysql_data:/var/lib/mysql  # Mount a volume for MySQL data storage
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    ports:
+      - "8081:80"
+    environment:
+      PMA_HOST: mysql
+    depends_on:
+      - mysql
+
+  springbootapp:
+    image: saghnash/umc:v3
+    restart: on-failure
+    ports:
+      - "7210:7210"
+    depends_on:
+      - mysql
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/umc-db
+      SPRING_DATASOURCE_USERNAME: umc-admin
+      SPRING_DATASOURCE_PASSWORD: admin@umc
+      SERVER_PORT: 7210
+
+volumes:
+  mysql_data:  # Define a named volume for MySQL data storage
